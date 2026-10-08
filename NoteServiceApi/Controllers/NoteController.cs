@@ -16,7 +16,7 @@ namespace NoteServiceApi.Controllers
         {
             _logger = logger;
             _noteService = noteService;
-        }
+        } 
 
 
         [HttpGet("AllNotes")]
