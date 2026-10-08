@@ -18,11 +18,11 @@ namespace NoteServiceApi.Service
 
     public class NoteService : INoteService
     {
-        private DatabaseService databaseService = null!;
+        private IDatabaseService _databaseService = null!;
 
         public NoteService(IDatabaseService databaseService)
         {
-            databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
+            _databaseService = databaseService ?? throw new ArgumentNullException(nameof(databaseService));
         }
 
 
@@ -32,7 +32,7 @@ namespace NoteServiceApi.Service
             try
             {
                 var sql = $"SELECT * FROM [Owner] ORDER BY Id asc";
-                var dbResp = await databaseService.ExecuteReader<Owner>(sql);
+                var dbResp = await _databaseService.ExecuteReader<Owner>(sql);
                 response.SetFailedIfSubFailed(dbResp);
                 response.Result = dbResp.Result;
             }
@@ -50,7 +50,7 @@ namespace NoteServiceApi.Service
             try
             {
                 var sql = $"SELECT * FROM [Note] ORDER BY Id asc";
-                var dbResp = await databaseService.ExecuteReader<Note>(sql);
+                var dbResp = await _databaseService.ExecuteReader<Note>(sql);
                 response.SetFailedIfSubFailed(dbResp);
                 response.Result = dbResp.Result;
             }
@@ -67,7 +67,7 @@ namespace NoteServiceApi.Service
             try
             {
                 var sql = $"SELECT * FROM [Note] WHERE Id = {noteId}";
-                var dbResp = await databaseService.ExecuteReader<Note>(sql);
+                var dbResp = await _databaseService.ExecuteReader<Note>(sql);
                 response.SetFailedIfSubFailed(dbResp);
                 response.Result = dbResp.Result?.FirstOrDefault();
             }
@@ -85,7 +85,7 @@ namespace NoteServiceApi.Service
             try
             {
                 var sql = $"SELECT * FROM [Note] WHERE OwnerId = ({ownerId}) ORDER BY Id asc";
-                var dbResp = await databaseService.ExecuteReader<Note>(sql);
+                var dbResp = await _databaseService.ExecuteReader<Note>(sql);
                 response.SetFailedIfSubFailed(dbResp);
                 response.Result = dbResp.Result;
             }
@@ -153,7 +153,7 @@ namespace NoteServiceApi.Service
                 {
                     var sql = $"INSERT INTO [Note] ([OwnerId], [Title], [Text], [CreatedBy], [CreatedOn], [LastModifiedBy], [LastModified], [Active]) VALUES (@OwnerId, @Title, @Text, @CreatedBy, @CreatedOn, @LastModifiedBy, @LastModified, @Active)";
                     var sqlParams = BuildParametersFromNoteObject(note, false, true, true, true);
-                    var dbResp = await databaseService.ExecuteInsert(sql, sqlParams);
+                    var dbResp = await _databaseService.ExecuteInsert(sql, sqlParams);
                     response.SetFailedIfSubFailed(dbResp);
                     response.Result = dbResp.Result;
                 }
@@ -177,9 +177,9 @@ namespace NoteServiceApi.Service
                 }
                 else
                 {
-                    var sql = $"UPDATE [Note] SET [OwnerId] = @OwnerId, [Title] = @Title, [Text] = @Text, [LastModifiedBy] = @LastModifiedBy, [LastModified] = @LastModified, [Active] =  @Active WHERE NoteId = {note.Id}";
+                    var sql = $"UPDATE [Note] SET [OwnerId] = @OwnerId, [Title] = @Title, [Text] = @Text, [LastModifiedBy] = @LastModifiedBy, [LastModified] = @LastModified, [Active] =  @Active WHERE Id = {note.Id}";
                     var sqlParams = BuildParametersFromNoteObject(note, false, true, true, true);
-                    var dbResp = await databaseService.ExecuteInsert(sql, sqlParams);
+                    var dbResp = await _databaseService.ExecuteNonQuery(sql, sqlParams);
                     response.SetFailedIfSubFailed(dbResp);
                     response.Result = dbResp.Result;
                 }
@@ -205,7 +205,7 @@ namespace NoteServiceApi.Service
                 else
                 {
                     var sql = $"DELETE FROM [Note] WHERE Id = {noteId}";
-                    var dbResp = await databaseService.ExecuteInsert(sql, null);
+                    var dbResp = await _databaseService.ExecuteNonQuery(sql, null);
                     response.SetFailedIfSubFailed(dbResp);
                     response.Result = dbResp.Result;
                 }

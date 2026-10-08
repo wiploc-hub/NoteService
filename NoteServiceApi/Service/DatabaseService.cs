@@ -113,7 +113,7 @@ namespace NoteServiceApi.Service
                 if (sqlParameters?.Any() == true)
                     cmd.Parameters.AddRange(sqlParameters.ToArray());
 
-                response.Result = ((int?)await cmd.ExecuteScalarAsync()) ?? 0;
+                response.Result = ((int?)(decimal?)await cmd.ExecuteScalarAsync()) ?? 0;
             }
             catch (Exception ex)
             {

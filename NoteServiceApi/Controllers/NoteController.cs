@@ -16,7 +16,17 @@ namespace NoteServiceApi.Controllers
         {
             _logger = logger;
             _noteService = noteService;
-        } 
+        }
+
+        [HttpGet("AllOwners")]
+        public async Task<ActionResult<MethodResponse<List<Owner>>>> GetAllOwners()
+        {
+            var resp = await _noteService.GetAllOwners();
+            if (!resp.Success)
+                return BadRequest(resp.Message);
+            else
+                return resp;
+        }
 
 
         [HttpGet("AllNotes")]
@@ -61,7 +71,7 @@ namespace NoteServiceApi.Controllers
         }
 
 
-        [HttpPut("update/{ownerId:int}")]
+        [HttpPut("update")]
         public async Task<ActionResult<MethodResponse<int>>> Update([FromBody] Note note)        
         {
             var resp = await _noteService.UpdateNote(note);
@@ -71,10 +81,10 @@ namespace NoteServiceApi.Controllers
                 return resp;
         }
 
-        [HttpDelete("delete/{ownerId:int}")]
-        public async Task<ActionResult<MethodResponse<int>>> DeleteById([FromBody] Note note)
+        [HttpDelete("delete/{noteId:int}")]
+        public async Task<ActionResult<MethodResponse<int>>> DeleteById(int noteId)
         {
-            var resp = await _noteService.UpdateNote(note);
+            var resp = await _noteService.DeleteNoteById(noteId);
             if (!resp.Success)
                 return BadRequest(resp.Message);
             else
